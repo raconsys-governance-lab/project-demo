@@ -1,0 +1,409 @@
+# Developer → Stage Approval Workflow
+
+## Purpose
+
+This document explains the complete workflow followed in our GitHub Governance Repository for moving code from a developer branch to the stage environment.
+
+---
+
+# Repository Structure
+
+## Branches
+
+### main
+
+Production branch.
+
+* Contains production-ready code.
+* Protected branch.
+* Direct push is not allowed.
+* Requires approval from Production Approvers.
+
+### stage
+
+Testing / pre-production branch.
+
+* Used for final validation.
+* Protected branch.
+* Direct push is not allowed.
+* Requires approval from Stage Approvers.
+
+### develop
+
+Integration branch.
+
+* Developers merge completed work here.
+* Protected branch.
+* Direct push is not allowed.
+* Requires Pull Request approval.
+
+### feature/*
+
+Developer working branches.
+
+Examples:
+
+* feature/subhu-testing
+* feature/subha-login
+* feature/biswa-dashboard
+
+Developers work only in their own feature branches.
+
+---
+
+# Teams
+
+## Developers
+
+Responsibilities:
+
+* Create feature branches.
+* Implement code changes.
+* Create Pull Requests.
+* Resolve comments and issues.
+
+Members:
+
+* Subhalaxmi
+* Pramod
+
+---
+
+## Stage-Approvers
+
+Responsibilities:
+
+* Review Pull Requests going from develop → stage.
+* Verify completed work.
+* Approve stage deployments.
+
+Members:
+
+* Pramod
+* Additional Stage Approver
+
+---
+
+## Production-Approvers
+
+Responsibilities:
+
+* Review Pull Requests going from stage → main.
+* Final production approval.
+
+Members:
+
+* Production Approver
+
+---
+
+# Practical Workflow
+
+## Scenario
+
+Developer: Subhalaxmi
+
+Task:
+
+Create a new file called:
+
+test-file.md
+
+---
+
+# Step 1: Create Feature Branch
+
+Developer creates:
+
+feature/subhu-testing
+
+Work is performed only inside this branch.
+
+---
+
+# Step 2: Add Code
+
+Developer adds:
+
+test-file.md
+
+Content:
+
+Testing developer workflow
+
+Commit Message:
+
+Add initial content to test-file.md
+
+---
+
+# Step 3: Create Pull Request
+
+Source:
+
+feature/subhu-testing
+
+Target:
+
+develop
+
+Pull Request Title:
+
+Feature: Subhu Testing Workflow
+
+Description:
+
+Developer completed testing workflow.
+
+Changes:
+
+* Added test-file.md
+
+Developer:
+Subhalaxmi
+
+---
+
+# Step 4: Review Required
+
+Because develop branch is protected:
+
+GitHub blocks merge.
+
+Status:
+
+Review required
+
+Merge blocked
+
+---
+
+# Step 5: Developer Approval Not Allowed
+
+The person creating the Pull Request cannot approve and merge their own change.
+
+Example:
+
+Subhalaxmi creates PR.
+
+Subhalaxmi cannot be final approver.
+
+Reason:
+
+Governance and audit requirements.
+
+---
+
+# Step 6: Reviewer Approval
+
+Pramod reviews:
+
+* Files Changed
+* Code Content
+* Commit History
+
+Actions:
+
+Review Changes
+→ Approve
+→ Submit Review
+
+---
+
+# Step 7: Merge To Develop
+
+After approval:
+
+feature/subhu-testing
+↓
+develop
+
+GitHub creates:
+
+Merge Pull Request #4
+
+Result:
+
+Code is now available in develop branch.
+
+---
+
+# Step 8: Promote To Stage
+
+After testing is completed in develop:
+
+Create new Pull Request.
+
+Source:
+
+develop
+
+Target:
+
+stage
+
+Title:
+
+Release Candidate v1
+
+Description:
+
+Promoting tested code from develop to stage.
+
+Approved for Stage validation.
+
+---
+
+# Step 9: Stage Approval
+
+Stage Approver reviews:
+
+* Commits
+* Files Changed
+* Pull Request Description
+
+If acceptable:
+
+Approve
+
+---
+
+# Step 10: Merge To Stage
+
+After approval:
+
+develop
+↓
+stage
+
+Result:
+
+Code enters stage environment.
+
+---
+
+# Step 11: Promote To Production
+
+After successful stage testing:
+
+Create Pull Request.
+
+Source:
+
+stage
+
+Target:
+
+main
+
+---
+
+# Step 12: Production Approval
+
+Production Approver reviews:
+
+* Business impact
+* Testing status
+* Release readiness
+
+Approve
+
+---
+
+# Step 13: Merge To Production
+
+stage
+↓
+main
+
+Result:
+
+Code reaches production.
+
+---
+
+# Why We Use Pull Requests
+
+Benefits:
+
+* No direct code injection.
+* No accidental overwrite.
+* Full audit history.
+* Approval tracking.
+* Clear accountability.
+* Controlled releases.
+
+---
+
+# Example Audit Trail
+
+Subhalaxmi
+→ Created feature/subhu-testing
+
+Subhalaxmi
+→ Added test-file.md
+
+Subhalaxmi
+→ Created Pull Request #4
+
+Pramod
+→ Reviewed Pull Request #4
+
+Pramod
+→ Approved Pull Request #4
+
+Pramod
+→ Merged Pull Request #4
+
+Subhalaxmi
+→ Created Release Candidate v1
+
+Stage Approver
+→ Approved Release Candidate v1
+
+Stage Approver
+→ Merged develop into stage
+
+Production Approver
+→ Approved Production Release
+
+Production Approver
+→ Merged stage into main
+
+---
+
+# Important Governance Rules
+
+1. No direct push to stage.
+
+2. No direct push to main.
+
+3. Every promotion requires Pull Request.
+
+4. Every Pull Request requires approval.
+
+5. Approver must be different from developer.
+
+6. All activities remain visible in GitHub history.
+
+7. Every release can be traced back to the responsible developer and approver.
+
+---
+
+# Current Governance Flow
+
+Developer
+↓
+Feature Branch
+↓
+Pull Request
+↓
+Develop
+↓
+Stage Approval
+↓
+Stage
+↓
+Production Approval
+↓
+Main (Production)

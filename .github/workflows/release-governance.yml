@@ -1,0 +1,59 @@
+name: Release Governance Logger
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  governance-log:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Generate Governance Report
+        run: |
+          echo "==================================" > release-log.txt
+          echo "      RELEASE GOVERNANCE REPORT" >> release-log.txt
+          echo "==================================" >> release-log.txt
+          echo "" >> release-log.txt
+
+          echo "Release Number: ${{ github.run_number }}" >> release-log.txt
+          echo "Date: $(date -u)" >> release-log.txt
+          echo "" >> release-log.txt
+
+          echo "Repository: ${{ github.repository }}" >> release-log.txt
+          echo "Target Branch: ${{ github.event.pull_request.base.ref }}" >> release-log.txt
+          echo "" >> release-log.txt
+
+          echo "PR Number: #${{ github.event.pull_request.number }}" >> release-log.txt
+          echo "PR Title: ${{ github.event.pull_request.title }}" >> release-log.txt
+          echo "" >> release-log.txt
+
+          echo "PR Author: ${{ github.event.pull_request.user.login }}" >> release-log.txt
+          echo "Merged By: ${{ github.actor }}" >> release-log.txt
+          echo "" >> release-log.txt
+
+          echo "Merge Commit SHA:" >> release-log.txt
+          echo "${{ github.event.pull_request.merge_commit_sha }}" >> release-log.txt
+          echo "" >> release-log.txt
+
+          echo "PR Description:" >> release-log.txt
+          echo "${{ github.event.pull_request.body }}" >> release-log.txt
+          echo "" >> release-log.txt
+
+          echo "Workflow URL:" >> release-log.txt
+          echo "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> release-log.txt
+
+      - name: Display Report
+        run: cat release-log.txt
+
+      - name: Upload Governance Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: governance-report-${{ github.run_number }}
+          path: release-log.txt
+          retention-days: 30

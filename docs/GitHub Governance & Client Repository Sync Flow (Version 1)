@@ -1,0 +1,308 @@
+# GitHub Governance & Client Repository Sync Flow (Version 1)
+
+## Objective
+
+Automatically send approved content from the source repository to a client repository using GitHub Actions.
+
+Current Proof of Concept:
+
+* Source Repository: `raconsys-governance-lab/project-demo`
+* Client Repository: `Amit96-dev/client-repo-test`
+* Trigger: Push to `main`
+* Test File: `README.md`
+
+---
+
+# Architecture
+
+```text
+Developer
+    ↓
+Feature Branch
+    ↓
+Pull Request
+    ↓
+Approval
+    ↓
+Merge To Main
+    ↓
+GitHub Action Triggered
+    ↓
+Clone Client Repository
+    ↓
+Copy Required Files
+    ↓
+Commit Changes
+    ↓
+Push To Client Repository
+```
+
+---
+
+# Repository Structure
+
+Source Repository
+
+```text
+project-demo
+│
+├── .github
+│   └── workflows
+│       ├── release-governance.yml
+│       └── client-sync.yml
+│
+├── README.md
+├── feature/
+└── test-file.md
+```
+
+Client Repository
+
+```text
+client-repo-test
+│
+└── README.md
+```
+
+---
+
+# Security Model
+
+## Personal Access Token (PAT)
+
+Owner:
+
+```text
+Amit96-dev
+```
+
+Purpose:
+
+```text
+Allow project-demo GitHub Action
+to push into client-repo-test
+```
+
+Permissions:
+
+```text
+Contents → Read and Write
+Metadata → Read Only
+```
+
+---
+
+# Secret Storage
+
+Repository:
+
+```text
+project-demo
+```
+
+Location:
+
+```text
+Settings
+→ Secrets and Variables
+→ Actions
+```
+
+Secret Name:
+
+```text
+CLIENT_REPO_TOKEN
+```
+
+Purpose:
+
+```text
+Store PAT securely.
+Never expose token in code.
+```
+
+---
+
+# GitHub Action Flow
+
+Workflow:
+
+```text
+.github/workflows/client-sync.yml
+```
+
+Trigger:
+
+```yaml
+on:
+  push:
+    branches:
+      - main
+```
+
+Meaning:
+
+```text
+Whenever main changes,
+run the workflow.
+```
+
+---
+
+# Runtime Flow
+
+Step 1
+
+GitHub detects:
+
+```text
+Push to main
+```
+
+Step 2
+
+GitHub creates temporary runner:
+
+```text
+Ubuntu VM
+```
+
+Step 3
+
+Runner checks out source repository:
+
+```text
+project-demo
+```
+
+Step 4
+
+Runner clones:
+
+```text
+Amit96-dev/client-repo-test
+```
+
+using:
+
+```text
+CLIENT_REPO_TOKEN
+```
+
+Step 5
+
+Runner copies files:
+
+```text
+README.md
+```
+
+Step 6
+
+Runner commits changes.
+
+Step 7
+
+Runner pushes changes.
+
+Step 8
+
+Runner is destroyed.
+
+---
+
+# Current Proof
+
+Verified Successfully:
+
+```text
+README.md changed
+        ↓
+GitHub Action executed
+        ↓
+README.md copied
+        ↓
+Appeared in client-repo-test
+```
+
+This confirms:
+
+* GitHub Actions working
+* Cross-account authentication working
+* Token working
+* Secret working
+* Repository sync working
+
+---
+
+# Future Upgrade
+
+Instead of:
+
+```text
+README.md
+```
+
+send:
+
+```text
+React Build Folder
+Spring Boot JAR
+Release ZIP
+Build Artifacts
+```
+
+Flow:
+
+```text
+Merge To Main
+        ↓
+Build Project
+        ↓
+Generate Build Output
+        ↓
+Push Build Output
+        ↓
+Client Repository
+```
+
+No source code required.
+
+---
+
+# Key Learning
+
+GitHub Actions does not run automatically by magic.
+
+GitHub checks:
+
+```text
+.github/workflows
+```
+
+If workflow files exist:
+
+```text
+Read Instructions
+Execute Instructions
+```
+
+If workflow files do not exist:
+
+```text
+Do Nothing
+```
+
+---
+
+# Current Status
+
+Governance: Complete
+
+Audit Logging: Complete
+
+Cross-Repository Sync: Complete
+
+Build Delivery: Pending
+
+Production Client Flow: Pending

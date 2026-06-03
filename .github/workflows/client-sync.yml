@@ -33,3 +33,55 @@ jobs:
           git commit -m "Sync from project-demo" || echo "No changes to commit"
 
           git push
+
+      - name: Generate Delivery Report
+        run: |
+          echo "==================================================" > delivery-report.txt
+          echo "            CLIENT DELIVERY REPORT" >> delivery-report.txt
+          echo "==================================================" >> delivery-report.txt
+          echo "" >> delivery-report.txt
+
+          echo "Delivery Number: ${{ github.run_number }}" >> delivery-report.txt
+          echo "Delivery Date: $(date -u)" >> delivery-report.txt
+          echo "" >> delivery-report.txt
+
+          echo "Source Repository:" >> delivery-report.txt
+          echo "${{ github.repository }}" >> delivery-report.txt
+          echo "" >> delivery-report.txt
+
+          echo "Target Repository:" >> delivery-report.txt
+          echo "Amit96-dev/client-repo-test" >> delivery-report.txt
+          echo "" >> delivery-report.txt
+
+          echo "Triggered By:" >> delivery-report.txt
+          echo "${{ github.actor }}" >> delivery-report.txt
+          echo "" >> delivery-report.txt
+
+          echo "Source Branch:" >> delivery-report.txt
+          echo "${{ github.ref_name }}" >> delivery-report.txt
+          echo "" >> delivery-report.txt
+
+          echo "Source Commit:" >> delivery-report.txt
+          echo "${{ github.sha }}" >> delivery-report.txt
+          echo "" >> delivery-report.txt
+
+          echo "Files Delivered:" >> delivery-report.txt
+          echo "README.md" >> delivery-report.txt
+          echo "" >> delivery-report.txt
+
+          echo "Delivery Status:" >> delivery-report.txt
+          echo "SUCCESS" >> delivery-report.txt
+          echo "" >> delivery-report.txt
+
+          echo "Workflow URL:" >> delivery-report.txt
+          echo "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> delivery-report.txt
+
+      - name: Display Delivery Report
+        run: cat delivery-report.txt
+
+      - name: Upload Delivery Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: delivery-report-${{ github.run_number }}
+          path: delivery-report.txt
+          retention-days: 90

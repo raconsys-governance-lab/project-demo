@@ -1,9 +1,13 @@
+
 name: Client Repo Sync
 
 on:
   push:
     branches:
       - main
+
+env:
+  CLIENT_REPO: Amit96-dev/client-repo-test
 
 jobs:
   sync-client:
@@ -12,12 +16,24 @@ jobs:
     steps:
       - name: Checkout Source Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Capture Source Information
+        run: |
+          echo "SOURCE_COMMIT=${{ github.sha }}" >> $GITHUB_ENV
+
+          echo "COMMIT_MESSAGE<<EOF" >> $GITHUB_ENV
+          git log -1 --pretty=%B >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          git diff --name-only HEAD~1 HEAD > changed-files.txt || echo "README.md" > changed-files.txt
 
       - name: Clone Client Repository
         run: |
-          git clone https://x-access-token:${{ secrets.CLIENT_REPO_TOKEN }}@github.com/Amit96-dev/client-repo-test.git client-repo
+          git clone https://x-access-token:${{ secrets.CLIENT_REPO_TOKEN }}@github.com/${CLIENT_REPO}.git client-repo
 
-      - name: Copy README
+      - name: Sync Files
         run: |
           cp README.md client-repo/
 
@@ -30,12 +46,18 @@ jobs:
 
           git add .
 
-          git commit -m "Sync from project-demo" || echo "No changes to commit"
+          git commit -m "Sync from ${{ github.repository }}" || echo "No changes"
 
           git push
 
+          CLIENT_COMMIT=$(git rev-parse HEAD)
+
+          echo "CLIENT_COMMIT=$CLIENT_COMMIT" >> $GITHUB_ENV
+
       - name: Generate Delivery Report
         run: |
+          FILE_COUNT=$(wc -l < changed-files.txt)
+
           echo "==================================================" > delivery-report.txt
           echo "            CLIENT DELIVERY REPORT" >> delivery-report.txt
           echo "==================================================" >> delivery-report.txt
@@ -43,38 +65,43 @@ jobs:
 
           echo "Delivery Number: ${{ github.run_number }}" >> delivery-report.txt
           echo "Delivery Date: $(date -u)" >> delivery-report.txt
+          echo "Delivery Status: SUCCESS" >> delivery-report.txt
           echo "" >> delivery-report.txt
 
-          echo "Source Repository:" >> delivery-report.txt
-          echo "${{ github.repository }}" >> delivery-report.txt
+          echo "SOURCE INFORMATION" >> delivery-report.txt
+          echo "--------------------------------------------------" >> delivery-report.txt
+          echo "Repository: ${{ github.repository }}" >> delivery-report.txt
+          echo "Branch: ${{ github.ref_name }}" >> delivery-report.txt
+          echo "Triggered By: ${{ github.actor }}" >> delivery-report.txt
+          echo "Source Commit: $SOURCE_COMMIT" >> delivery-report.txt
           echo "" >> delivery-report.txt
 
-          echo "Target Repository:" >> delivery-report.txt
-          echo "Amit96-dev/client-repo-test" >> delivery-report.txt
+          echo "TARGET INFORMATION" >> delivery-report.txt
+          echo "--------------------------------------------------" >> delivery-report.txt
+          echo "Repository: ${CLIENT_REPO}" >> delivery-report.txt
+          echo "Branch: main" >> delivery-report.txt
+          echo "Client Commit: $CLIENT_COMMIT" >> delivery-report.txt
           echo "" >> delivery-report.txt
 
-          echo "Triggered By:" >> delivery-report.txt
-          echo "${{ github.actor }}" >> delivery-report.txt
+          echo "CHANGE INFORMATION" >> delivery-report.txt
+          echo "--------------------------------------------------" >> delivery-report.txt
+          echo "Commit Message:" >> delivery-report.txt
+          echo "$COMMIT_MESSAGE" >> delivery-report.txt
           echo "" >> delivery-report.txt
 
-          echo "Source Branch:" >> delivery-report.txt
-          echo "${{ github.ref_name }}" >> delivery-report.txt
+          echo "Files Delivered ($FILE_COUNT):" >> delivery-report.txt
+          cat changed-files.txt >> delivery-report.txt
           echo "" >> delivery-report.txt
 
-          echo "Source Commit:" >> delivery-report.txt
-          echo "${{ github.sha }}" >> delivery-report.txt
-          echo "" >> delivery-report.txt
-
-          echo "Files Delivered:" >> delivery-report.txt
-          echo "README.md" >> delivery-report.txt
-          echo "" >> delivery-report.txt
-
-          echo "Delivery Status:" >> delivery-report.txt
-          echo "SUCCESS" >> delivery-report.txt
-          echo "" >> delivery-report.txt
-
+          echo "TRACEABILITY" >> delivery-report.txt
+          echo "--------------------------------------------------" >> delivery-report.txt
+          echo "Workflow Run Number: ${{ github.run_number }}" >> delivery-report.txt
+          echo "Workflow Run ID: ${{ github.run_id }}" >> delivery-report.txt
           echo "Workflow URL:" >> delivery-report.txt
           echo "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> delivery-report.txt
+          echo "" >> delivery-report.txt
+
+          echo "END OF REPORT" >> delivery-report.txt
 
       - name: Display Delivery Report
         run: cat delivery-report.txt
@@ -85,3 +112,4 @@ jobs:
           name: delivery-report-${{ github.run_number }}
           path: delivery-report.txt
           retention-days: 90
+```

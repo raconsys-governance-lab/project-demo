@@ -1,0 +1,35 @@
+name: Client Repo Sync
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync-client:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Repository
+        uses: actions/checkout@v4
+
+      - name: Clone Client Repository
+        run: |
+          git clone https://x-access-token:${{ secrets.CLIENT_REPO_TOKEN }}@github.com/Amit96-dev/client-repo-test.git client-repo
+
+      - name: Copy README
+        run: |
+          cp README.md client-repo/
+
+      - name: Push Changes To Client Repo
+        run: |
+          cd client-repo
+
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+          git add .
+
+          git commit -m "Sync from project-demo" || echo "No changes to commit"
+
+          git push

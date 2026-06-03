@@ -1,0 +1,323 @@
+# GitHub Client Delivery Token Flow
+
+## Objective
+
+Allow GitHub Actions in our source repository to automatically push files/builds into a client's GitHub repository.
+
+---
+
+# Architecture Overview
+
+Source Repository
+↓
+GitHub Actions
+↓
+Client Repository Token
+↓
+Client Repository
+↓
+Delivery Report
+
+Example:
+
+Source Repository:
+raconsys-governance-lab/project-demo
+
+Client Repository:
+Amit96-dev/client-repo-test
+
+---
+
+# Step 1 - Client Creates Repository
+
+The client creates a repository that will receive releases/builds.
+
+Example:
+
+Amit96-dev/client-repo-test
+
+Future examples:
+
+client-company/frontend-release
+
+client-company/backend-release
+
+client-company/production-builds
+
+This repository is owned by the client.
+
+---
+
+# Step 2 - Client Generates Access Token
+
+Login to Client GitHub Account.
+
+Navigate:
+
+Profile Picture
+→ Settings
+→ Developer Settings
+→ Personal Access Tokens
+→ Fine-grained Tokens
+→ Generate New Token
+
+---
+
+# Step 3 - Configure Token
+
+Token Name:
+
+Client Delivery Token
+
+or
+
+Project Sync Token
+
+---
+
+Repository Access:
+
+Only selected repositories
+
+Select:
+
+client-repo-test
+
+---
+
+Repository Permissions:
+
+Contents → Read and Write
+
+No other permissions required for basic delivery.
+
+---
+
+# Step 4 - Generate Token
+
+Click:
+
+Generate Token
+
+GitHub provides a token.
+
+Example:
+
+github_pat_xxxxxxxxxxxxxxxxxxxxx
+
+Important:
+
+Copy immediately.
+
+GitHub will not display it again.
+
+---
+
+# Step 5 - Store Token In Source Repository
+
+Login to Source Repository Account.
+
+Repository:
+
+raconsys-governance-lab/project-demo
+
+Navigate:
+
+Settings
+→ Secrets and Variables
+→ Actions
+→ New Repository Secret
+
+---
+
+Secret Name:
+
+CLIENT_REPO_TOKEN
+
+Secret Value:
+
+github_pat_xxxxxxxxxxxxxxxxxxxxx
+
+Save Secret.
+
+---
+
+# Step 6 - Configure Workflow
+
+Inside GitHub Action:
+
+env:
+CLIENT_REPO: Amit96-dev/client-repo-test
+
+This defines the target repository.
+
+---
+
+# Step 7 - GitHub Action Uses Token
+
+Example:
+
+git clone [https://x-access-token:${{](https://x-access-token:${{) secrets.CLIENT_REPO_TOKEN }}@github.com/${CLIENT_REPO}.git
+
+What happens:
+
+GitHub Actions reads the token.
+
+GitHub authenticates.
+
+GitHub allows access to the client repository.
+
+Client repository is cloned.
+
+---
+
+# Step 8 - Sync Files
+
+Example:
+
+cp README.md client-repo/
+
+Future examples:
+
+cp build.zip client-repo/
+
+cp app.jar client-repo/
+
+cp frontend-build/* client-repo/
+
+Files are copied into the client repository.
+
+---
+
+# Step 9 - Commit Changes
+
+GitHub Actions creates a commit:
+
+git add .
+git commit -m "Sync from project-demo"
+
+This creates a delivery commit inside the client repository.
+
+---
+
+# Step 10 - Push To Client Repository
+
+GitHub Actions executes:
+
+git push
+
+Result:
+
+Files appear automatically inside the client repository.
+
+No manual work required.
+
+---
+
+# Step 11 - Generate Delivery Report
+
+GitHub Actions creates:
+
+delivery-report.txt
+
+Example:
+
+CLIENT DELIVERY REPORT
+
+Source Repository:
+raconsys-governance-lab/project-demo
+
+Target Repository:
+Amit96-dev/client-repo-test
+
+Triggered By:
+subhu-22
+
+Source Commit:
+913f90c0475a636d890cdbb7ccfbc0ae117189da
+
+Client Commit:
+58b1ded3ef78c1c3f5d626ce274a7931a7623193
+
+Delivery Status:
+SUCCESS
+
+Workflow Run ID:
+26885065773
+
+---
+
+# Step 12 - Upload Report
+
+GitHub Actions uploads:
+
+delivery-report.txt
+
+as an artifact.
+
+Location:
+
+Actions
+→ Workflow Run
+→ Artifacts
+→ Download
+
+Reports remain available for audit and traceability.
+
+---
+
+# Security Model
+
+Client owns:
+
+Repository
+Token
+
+Our repository owns:
+
+Workflow
+Automation
+
+The token grants access only to the repositories selected by the client.
+
+No source code is exposed unless explicitly copied.
+
+---
+
+# Production Flow
+
+Developer
+↓
+Feature
+↓
+Develop
+↓
+Stage
+↓
+Main
+↓
+GitHub Actions
+↓
+Build Generated
+↓
+Client Repository
+↓
+Delivery Report Generated
+↓
+Artifact Stored
+
+---
+
+# Memory Shortcut
+
+Token is CREATED by the client.
+
+Token is STORED in our repository secret.
+
+Token is USED by GitHub Actions.
+
+Token gives ACCESS to the client repository.
+
+GitHub Actions PUSHES files to the client repository.
+
+Delivery Report proves what was delivered.

@@ -1,0 +1,32 @@
+name: Release Logger
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release-log:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Generate Release Log
+        run: |
+          echo "===== RELEASE LOG =====" > release-log.txt
+          echo "Date: $(date)" >> release-log.txt
+          echo "Repository: ${{ github.repository }}" >> release-log.txt
+          echo "Branch: ${{ github.ref_name }}" >> release-log.txt
+          echo "Author: ${{ github.actor }}" >> release-log.txt
+          echo "Commit: ${{ github.sha }}" >> release-log.txt
+
+      - name: Display Log
+        run: cat release-log.txt
+
+      - name: Upload Log Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-log
+          path: release-log.txt

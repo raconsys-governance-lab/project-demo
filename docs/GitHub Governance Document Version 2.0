@@ -1,0 +1,484 @@
+# GitHub Governance Document
+
+## Version
+
+Version: 2.0
+
+Maintained By:
+Raconsys Governance Team
+
+---
+
+# 1. Organization Structure
+
+## Governance Hierarchy
+
+Owner
+↓
+Release Manager
+↓
+Tech Lead
+↓
+Developer
+
+---
+
+## Owner Responsibilities
+
+Owners are responsible for:
+
+* Repository Governance
+* Security Policies
+* Branch Protection Rules
+* GitHub Actions Governance
+* Secrets Management
+* Team Management
+* Repository Administration
+
+Owners have full administrative access.
+
+Number of Owners should be limited.
+
+Recommended:
+
+* Owner 1
+* Owner 2
+
+---
+
+## Release Manager Responsibilities
+
+Release Managers are responsible for:
+
+* Production Release Approval
+* Stage → Main Approval
+* Release Monitoring
+* Client Delivery Validation
+* Audit Report Review
+
+---
+
+## Tech Lead Responsibilities
+
+Tech Leads are responsible for:
+
+* Code Review
+* Feature Validation
+* Develop → Stage Approval
+* Technical Quality Assurance
+* Team Guidance
+
+---
+
+## Developer Responsibilities
+
+Developers are responsible for:
+
+* Feature Development
+* Bug Fixes
+* Pull Requests
+* Unit Testing
+* Code Reviews
+
+---
+
+# 2. Account Naming Standard
+
+## GitHub Username Standard
+
+Format:
+
+companyname-dev-name
+
+Examples:
+
+scrumiq-dev-subhu
+
+scrumiq-dev-pramod
+
+scrumiq-dev-rakesh
+
+---
+
+## Branch Naming Standard
+
+Feature:
+
+feature/<feature-name>
+
+Examples:
+
+feature/login-page
+
+feature/user-management
+
+---
+
+Bug Fix:
+
+bugfix/<issue-name>
+
+Examples:
+
+bugfix/payment-calculation
+
+bugfix/login-validation
+
+---
+
+Hotfix:
+
+hotfix/<issue-name>
+
+Examples:
+
+hotfix/production-login-failure
+
+hotfix/payment-crash
+
+---
+
+# 3. Repository Branch Strategy
+
+## Branch Structure
+
+feature/*
+↓
+develop
+↓
+stage
+↓
+main
+
+---
+
+## Branch Purpose
+
+### feature/*
+
+Development Branch
+
+Used for:
+
+* New Features
+* Enhancements
+* Bug Fixes
+
+---
+
+### develop
+
+Integration Branch
+
+Used for:
+
+* Team Integration
+* Feature Consolidation
+* Internal Testing
+
+---
+
+### stage
+
+Pre-Production Branch
+
+Used for:
+
+* QA Testing
+* UAT Validation
+* Security Verification
+
+---
+
+### main
+
+Production Branch
+
+Used for:
+
+* Production Releases
+* Client Deliveries
+
+---
+
+# 4. Permission Matrix
+
+| Activity              | Developer | Tech Lead | Release Manager | Owner |
+| --------------------- | --------- | --------- | --------------- | ----- |
+| Create Feature Branch | Yes       | Yes       | Yes             | Yes   |
+| Push Feature Branch   | Yes       | Yes       | Yes             | Yes   |
+| Create PR             | Yes       | Yes       | Yes             | Yes   |
+| Approve Develop PR    | No        | Yes       | Yes             | Yes   |
+| Approve Stage PR      | No        | Yes       | Yes             | Yes   |
+| Approve Main PR       | No        | No        | Yes             | Yes   |
+| Merge To Develop      | No        | Yes       | Yes             | Yes   |
+| Merge To Stage        | No        | Yes       | Yes             | Yes   |
+| Merge To Main         | No        | No        | Yes             | Yes   |
+| Modify Branch Rules   | No        | No        | No              | Yes   |
+| Manage Secrets        | No        | No        | No              | Yes   |
+| Modify Actions        | No        | No        | No              | Yes   |
+| Manage Teams          | No        | No        | No              | Yes   |
+
+---
+
+# 5. Branch Protection Rules
+
+## Develop Branch
+
+Rules:
+
+* Pull Request Required
+* Minimum 1 Approval
+* No Force Push
+* No Direct Push
+* Conversation Resolution Required
+
+Approver:
+
+Tech Lead
+
+---
+
+## Stage Branch
+
+Rules:
+
+* Pull Request Required
+* Minimum 1 Approval
+* No Force Push
+* No Direct Push
+* Conversation Resolution Required
+* Branch Must Be Up To Date
+
+Approver:
+
+Release Manager
+
+---
+
+## Main Branch
+
+Rules:
+
+* Pull Request Required
+* Minimum 2 Approvals
+* No Force Push
+* No Direct Push
+* Conversation Resolution Required
+* Branch Must Be Up To Date
+* Required Status Checks Enabled
+
+Approvers:
+
+Release Manager
+Owner
+
+---
+
+# 6. GitHub Actions Policy
+
+GitHub Actions shall be used for:
+
+* Build Generation
+* Governance Logging
+* Delivery Logging
+* Client Repository Synchronization
+* Future CI/CD Automation
+
+---
+
+## Workflow Storage
+
+All workflows shall be stored in:
+
+.github/workflows
+
+---
+
+## Workflow Modification
+
+Only Owners may:
+
+* Create Workflows
+* Modify Workflows
+* Delete Workflows
+
+---
+
+# 7. Logging & Audit Policy
+
+## Governance Report
+
+Generated automatically on:
+
+Pull Request Merge
+
+Captures:
+
+* PR Number
+* PR Title
+* Author
+* Reviewer
+* Merge Information
+* Repository
+* Branch
+* Commit Information
+
+---
+
+## Client Delivery Report
+
+Generated automatically on:
+
+Client Delivery
+
+Captures:
+
+* Source Repository
+* Target Repository
+* Source Commit
+* Client Commit
+* Delivery Status
+* Workflow Information
+* Delivery Timestamp
+
+---
+
+## Report Retention
+
+Minimum Retention:
+
+90 Days
+
+Future Enhancement:
+
+Central Audit Repository
+
+---
+
+# 8. Client Delivery Governance
+
+## Client Access Policy
+
+Clients shall have access only to:
+
+Client Repository
+
+Clients shall not have access to:
+
+* Source Repository
+* Develop Branch
+* Stage Branch
+* GitHub Actions
+* Secrets
+* Governance Settings
+
+---
+
+## Delivery Method
+
+GitHub Actions
+
+Authentication Method:
+
+CLIENT_REPO_TOKEN
+
+Stored As:
+
+GitHub Repository Secret
+
+---
+
+# 9. Build Delivery Policy
+
+## Delivery Principle
+
+Only Build Artifacts shall be delivered.
+
+Source Code shall not be delivered.
+
+---
+
+## Approved Deliverables
+
+React:
+
+dist/
+
+Angular:
+
+dist/
+
+Spring Boot:
+
+app.jar
+
+Release Documentation:
+
+release-report.txt
+
+delivery-report.txt
+
+---
+
+## Prohibited Deliverables
+
+Source Files:
+
+src/
+
+GitHub Configuration:
+
+.github/
+
+Feature Branch Content
+
+Development Configuration Files
+
+Internal Governance Documents
+
+---
+
+# 10. Release Workflow
+
+Developer
+↓
+Feature Branch
+
+feature/*
+↓
+Pull Request
+
+develop
+↓
+Approval
+
+stage
+↓
+Approval
+
+main
+↓
+GitHub Actions
+
+Build Generation
+↓
+Client Delivery
+↓
+Delivery Report
+↓
+Audit Storage
+
+---
+
+# Governance Status
+
+Organization Governance: Active
+
+Branch Governance: Active
+
+Client Delivery Governance: Active
+
+Audit Governance: Active
+
+Build Governance: Active

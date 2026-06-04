@@ -1,4 +1,5 @@
 # GitHub Governance Document
+Version 1.0
 
 ## Repository Structure
 

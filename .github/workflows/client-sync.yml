@@ -27,15 +27,26 @@ jobs:
           git log -1 --pretty=%B >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-          git diff --name-only HEAD~1 HEAD > changed-files.txt || echo "README.md" > changed-files.txt
+          git diff --name-only HEAD~1 HEAD > changed-files.txt || echo "No previous commit" > changed-files.txt
+
+      - name: Generate Fake Build
+        run: |
+          mkdir -p dist
+
+          echo "Build Number: ${{ github.run_number }}" > dist/build-info.txt
+          echo "Repository: ${{ github.repository }}" >> dist/build-info.txt
+          echo "Commit: ${{ github.sha }}" >> dist/build-info.txt
+          echo "Branch: ${{ github.ref_name }}" >> dist/build-info.txt
+          echo "Triggered By: ${{ github.actor }}" >> dist/build-info.txt
+          echo "Date: $(date -u)" >> dist/build-info.txt
 
       - name: Clone Client Repository
         run: |
           git clone https://x-access-token:${{ secrets.CLIENT_REPO_TOKEN }}@github.com/${CLIENT_REPO}.git client-repo
 
-      - name: Sync Files
+      - name: Sync Build Files
         run: |
-          cp README.md client-repo/
+          cp -r dist/* client-repo/
 
       - name: Push Changes To Client Repo
         run: |
@@ -46,7 +57,7 @@ jobs:
 
           git add .
 
-          git commit -m "Sync from ${{ github.repository }}" || echo "No changes"
+          git commit -m "Build delivery from ${{ github.repository }}" || echo "No changes"
 
           git push
 
@@ -56,7 +67,7 @@ jobs:
 
       - name: Generate Delivery Report
         run: |
-          FILE_COUNT=$(wc -l < changed-files.txt)
+          FILE_COUNT=$(find dist -type f | wc -l)
 
           echo "==================================================" > delivery-report.txt
           echo "            CLIENT DELIVERY REPORT" >> delivery-report.txt
@@ -83,14 +94,14 @@ jobs:
           echo "Client Commit: $CLIENT_COMMIT" >> delivery-report.txt
           echo "" >> delivery-report.txt
 
-          echo "CHANGE INFORMATION" >> delivery-report.txt
+          echo "BUILD INFORMATION" >> delivery-report.txt
           echo "--------------------------------------------------" >> delivery-report.txt
-          echo "Commit Message:" >> delivery-report.txt
-          echo "$COMMIT_MESSAGE" >> delivery-report.txt
+          echo "Build Folder: dist" >> delivery-report.txt
+          echo "Files Delivered: $FILE_COUNT" >> delivery-report.txt
           echo "" >> delivery-report.txt
 
-          echo "Files Delivered ($FILE_COUNT):" >> delivery-report.txt
-          cat changed-files.txt >> delivery-report.txt
+          echo "Commit Message:" >> delivery-report.txt
+          echo "$COMMIT_MESSAGE" >> delivery-report.txt
           echo "" >> delivery-report.txt
 
           echo "TRACEABILITY" >> delivery-report.txt

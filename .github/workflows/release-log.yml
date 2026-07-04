@@ -15,18 +15,43 @@ jobs:
 
       - name: Generate Release Log
         run: |
-          echo "===== RELEASE LOG =====" > release-log.txt
-          echo "Date: $(date)" >> release-log.txt
+          echo "==================================" > release-log.txt
+          echo "         RELEASE REPORT" >> release-log.txt
+          echo "==================================" >> release-log.txt
+          echo "" >> release-log.txt
+
+          echo "Run Number: ${{ github.run_number }}" >> release-log.txt
+          echo "Date: $(date -u)" >> release-log.txt
+          echo "Event: ${{ github.event_name }}" >> release-log.txt
+          echo "" >> release-log.txt
+
           echo "Repository: ${{ github.repository }}" >> release-log.txt
           echo "Branch: ${{ github.ref_name }}" >> release-log.txt
           echo "Author: ${{ github.actor }}" >> release-log.txt
-          echo "Commit: ${{ github.sha }}" >> release-log.txt
+          echo "" >> release-log.txt
+
+          echo "Commit SHA:" >> release-log.txt
+          echo "${{ github.sha }}" >> release-log.txt
+          echo "" >> release-log.txt
+
+          echo "Commit Message:" >> release-log.txt
+          git log -1 --pretty=%B >> release-log.txt
+          echo "" >> release-log.txt
+
+          echo "Files Changed:" >> release-log.txt
+          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} >> release-log.txt
+          echo "" >> release-log.txt
+
+          echo "Workflow URL:" >> release-log.txt
+          echo "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> release-log.txt
 
       - name: Display Log
-        run: cat release-log.txt
+        run: |
+          cat release-log.txt
 
       - name: Upload Log Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-log
+          name: release-log-run-${{ github.run_number }}
           path: release-log.txt
+          retention-days: 30
